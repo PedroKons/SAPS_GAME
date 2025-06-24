@@ -147,7 +147,7 @@ const Ranking = () => {
                 <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Top 10 Jogadores</h2>
                 
                 <div className="space-y-4">
-                  {leaderboard.map((user, index) => (
+                  {leaderboard.map((user) => (
                     <div
                       key={user.id}
                       className={`flex items-center justify-between p-4 rounded-xl border-2 transition-all duration-300 hover:shadow-lg ${
