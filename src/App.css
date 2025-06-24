@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'Libras2002';
+  src: url('./assets/fonts/libras2002.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.libras-font {
+  font-family: 'Libras2002', sans-serif;
+}
