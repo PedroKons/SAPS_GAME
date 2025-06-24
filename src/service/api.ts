@@ -1,7 +1,7 @@
 import { saveToken } from './auth';
 import shuffle from 'shuffle-array';
 
-const API_URL = 'http://localhost:3000';
+const API_URL = 'https://saps-game-api-saps.a3mewz.easypanel.host';
 
 interface WordItem {
     id: string;
