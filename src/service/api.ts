@@ -1,4 +1,4 @@
-import { saveToken } from './auth';
+import { saveToken, getToken } from './auth';
 import shuffle from 'shuffle-array';
 
 const API_URL = 'https://saps-game-api-saps.a3mewz.easypanel.host';
@@ -109,7 +109,7 @@ export async function words() {
 
 // Funções de Ranking
 export async function getLeaderboard(): Promise<RankingUser[]> {
-    const token = localStorage.getItem('token');
+    const token = getToken();
     if (!token) {
         throw new Error('Token não encontrado');
     }
@@ -131,7 +131,7 @@ export async function getLeaderboard(): Promise<RankingUser[]> {
 }
 
 export async function getMyPosition(): Promise<MyPosition> {
-    const token = localStorage.getItem('token');
+    const token = getToken();
     if (!token) {
         throw new Error('Token não encontrado');
     }
@@ -153,7 +153,7 @@ export async function getMyPosition(): Promise<MyPosition> {
 }
 
 export async function addPoints(points: number): Promise<any> {
-    const token = localStorage.getItem('token');
+    const token = getToken();
     if (!token) {
         throw new Error('Token não encontrado');
     }
@@ -176,7 +176,7 @@ export async function addPoints(points: number): Promise<any> {
 }
 
 export async function getFullRanking(page: number = 1, limit: number = 20): Promise<any> {
-    const token = localStorage.getItem('token');
+    const token = getToken();
     if (!token) {
         throw new Error('Token não encontrado');
     }

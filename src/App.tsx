@@ -5,13 +5,19 @@ import { Register } from './components/Register'
 import { GameLayout } from './components/GameLayout'
 import { PrivateRoute } from './components/PrivateRoute'
 import Ranking from './components/Ranking'
+import { isAuthenticated } from './service/auth'
+
+// Componente para verificar autenticação na rota raiz
+const RootRedirect = () => {
+  return isAuthenticated() ? <Navigate to="/game" replace /> : <Navigate to="/login" replace />;
+};
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* Rota raiz redireciona para login */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        {/* Rota raiz verifica autenticação e redireciona adequadamente */}
+        <Route path="/" element={<RootRedirect />} />
         
         {/* Rotas públicas */}
         <Route path="/login" element={<Login />} />
