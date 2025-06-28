@@ -1,7 +1,8 @@
 import { saveToken, getToken } from './auth';
 import shuffle from 'shuffle-array';
 
-const API_URL = 'https://saps-game-api-saps.a3mewz.easypanel.host';
+// const API_URL = 'https://saps-game-api-saps.a3mewz.easypanel.host';
+const API_URL = 'http://localhost:3001';
 
 interface WordItem {
     id: string;
@@ -27,7 +28,36 @@ interface MyPosition {
 
 interface RankingResponse {
     success: boolean;
-    data: RankingUser[] | MyPosition | any;
+    data: RankingUser[] | MyPosition;
+}
+
+interface LoginResponse {
+    success: boolean;
+    token: string;
+    flag: boolean; // true = admin, false = usuário normal
+    user: {
+        id: string;
+        username: string;
+        email: string;
+    };
+}
+
+interface PaginatedWordsResponse {
+    success: boolean;
+    data: WordItem[];
+    pagination: {
+        currentPage: number;
+        totalPages: number;
+        totalWords: number;
+        wordsPerPage: number;
+        hasNextPage: boolean;
+        hasPrevPage: boolean;
+    };
+}
+
+interface ApiResponse {
+    success: boolean;
+    message: string;
 }
 
 export async function register(data: {username: string, email: string, password: string}) {
@@ -49,7 +79,7 @@ export async function register(data: {username: string, email: string, password:
     return result;
 }
 
-export async function login(data: {email: string, password: string}) {
+export async function login(data: {email: string, password: string}): Promise<LoginResponse> {
     const response = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
@@ -62,11 +92,11 @@ export async function login(data: {email: string, password: string}) {
         throw new Error('Failed to login');
     }
 
-    const result = await response.json();
+    const result: LoginResponse = await response.json();
     
     // Salvar o token se a resposta incluir um
     if (result.token) {
-        saveToken(result.token);
+        saveToken(result.token, result.flag);
     }
 
     return result;
@@ -152,7 +182,7 @@ export async function getMyPosition(): Promise<MyPosition> {
     return result.data as MyPosition;
 }
 
-export async function addPoints(points: number): Promise<any> {
+export async function addPoints(points: number): Promise<void> {
     const token = getToken();
     if (!token) {
         throw new Error('Token não encontrado');
@@ -175,7 +205,7 @@ export async function addPoints(points: number): Promise<any> {
     return result.data;
 }
 
-export async function getFullRanking(page: number = 1, limit: number = 20): Promise<any> {
+export async function getFullRanking(page: number = 1, limit: number = 20): Promise<RankingUser[]> {
     const token = getToken();
     if (!token) {
         throw new Error('Token não encontrado');
@@ -195,4 +225,75 @@ export async function getFullRanking(page: number = 1, limit: number = 20): Prom
 
     const result = await response.json();
     return result.data;
+}
+
+// Funções de Administração
+export async function getPaginatedWords(page: number = 1, limit: number = 50): Promise<PaginatedWordsResponse> {
+    const token = getToken();
+    if (!token) {
+        throw new Error('Token não encontrado');
+    }
+
+    const response = await fetch(`${API_URL}/api/words/paginated?page=${page}&limit=${limit}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error('Erro ao buscar palavras paginadas');
+    }
+
+    const result: PaginatedWordsResponse = await response.json();
+    return result;
+}
+
+export async function addWord(word: string): Promise<ApiResponse> {
+    const token = getToken();
+    if (!token) {
+        throw new Error('Token não encontrado');
+    }
+
+    const response = await fetch(`${API_URL}/api/words`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ word: word.trim() }),
+    });
+
+    if (!response.ok) {
+        if (response.status === 409) {
+            throw new Error('Esta palavra já existe');
+        }
+        throw new Error('Erro ao adicionar palavra');
+    }
+
+    const result: ApiResponse = await response.json();
+    return result;
+}
+
+export async function deleteWord(wordId: string): Promise<ApiResponse> {
+    const token = getToken();
+    if (!token) {
+        throw new Error('Token não encontrado');
+    }
+
+    const response = await fetch(`${API_URL}/api/words?id=${wordId}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error('Erro ao deletar palavra');
+    }
+
+    const result: ApiResponse = await response.json();
+    return result;
 }

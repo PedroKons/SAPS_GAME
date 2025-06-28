@@ -4,7 +4,9 @@ import { Login } from './components/Login'
 import { Register } from './components/Register'
 import { GameLayout } from './components/GameLayout'
 import { PrivateRoute } from './components/PrivateRoute'
+import { AdminRoute } from './components/AdminRoute'
 import Ranking from './components/Ranking'
+import { Admin } from './components/Admin'
 import { isAuthenticated } from './service/auth'
 
 // Componente para verificar autenticação na rota raiz
@@ -40,6 +42,16 @@ function App() {
             <PrivateRoute>
               <Ranking />
             </PrivateRoute>
+          } 
+        />
+        
+        {/* Rota protegida do admin - apenas usuários ADMIN podem acessar */}
+        <Route 
+          path="/admin" 
+          element={
+            <AdminRoute>
+              <Admin />
+            </AdminRoute>
           } 
         />
         
